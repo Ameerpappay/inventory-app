@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  salesOrders    SalesOrder[]
+  purchaseOrders PurchaseOrder[]
+  inventory      Inventory[]
+
+  @@map("users")
+}
+
+model SalesOrder {
+  id            String           @id @default(cuid())
+  orderNumber   String           @unique @map("order_number")
+  customerName  String           @map("customer_name")
+  customerEmail String           @map("customer_email")
+  totalAmount   Decimal          @default(0) @map("total_amount") @db.Decimal(10, 2)
+  status        SalesOrderStatus @default(PENDING)
+  orderDate     DateTime         @default(now()) @map("order_date") @db.Date
+  createdAt     DateTime         @default(now()) @map("created_at")
+  userId        String           @map("user_id")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([orderDate])
+  @@map("sales_orders")
+}
+
+model PurchaseOrder {
+  id               String              @id @default(cuid())
+  poNumber         String              @unique @map("po_number")
+  supplierName     String              @map("supplier_name")
+  supplierEmail    String              @map("supplier_email")
+  totalAmount      Decimal             @default(0) @map("total_amount") @db.Decimal(10, 2)
+  status           PurchaseOrderStatus @default(PENDING)
+  orderDate        DateTime            @default(now()) @map("order_date") @db.Date
+  expectedDelivery DateTime            @map("expected_delivery") @db.Date
+  createdAt        DateTime            @default(now()) @map("created_at")
+  userId           String              @map("user_id")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([orderDate])
+  @@map("purchase_orders")
+}
+
+model Inventory {
+  id           String   @id @default(cuid())
+  productName  String   @map("product_name")
+  sku          String   @unique
+  category     String   @default("Other")
+  quantity     Int      @default(0)
+  unitPrice    Decimal  @default(0) @map("unit_price") @db.Decimal(10, 2)
+  reorderLevel Int      @default(10) @map("reorder_level")
+  supplier     String   @default("")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  userId       String   @map("user_id")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([category])
+  @@index([sku])
+  @@map("inventory")
+}
+
+enum SalesOrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+
+  @@map("sales_order_status")
+}
+
+enum PurchaseOrderStatus {
+  PENDING
+  APPROVED
+  RECEIVED
+  CANCELLED
+
+  @@map("purchase_order_status")
+}
