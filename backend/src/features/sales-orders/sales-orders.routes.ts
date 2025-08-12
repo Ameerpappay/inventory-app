@@ -19,7 +19,7 @@ router.post(
     body("orderNumber").trim().isLength({ min: 1 }),
     body("customerName").trim().isLength({ min: 1 }),
     body("customerEmail").isEmail().normalizeEmail(),
-    body("totalAmount").isDecimal({ decimal_digits: "0,2" }),
+    body("totalAmount").isFloat({ min: 0 }),
     body("status")
       .optional()
       .isIn(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]),
@@ -36,7 +36,7 @@ router.put(
     body("orderNumber").optional().trim().isLength({ min: 1 }),
     body("customerName").optional().trim().isLength({ min: 1 }),
     body("customerEmail").optional().isEmail().normalizeEmail(),
-    body("totalAmount").optional().isDecimal({ decimal_digits: "0,2" }),
+    body("totalAmount").optional().isFloat({ min: 0 }),
     body("status")
       .optional()
       .isIn(["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]),
