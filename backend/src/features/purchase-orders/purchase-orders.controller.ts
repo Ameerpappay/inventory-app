@@ -55,7 +55,23 @@ export class PurchaseOrderController {
         status = "PENDING",
         orderDate,
         expectedDelivery,
+        supplierId,
+        notes,
+        items,
       } = req.body;
+
+      console.log("📦 Received purchase order data:", {
+        poNumber,
+        supplierName,
+        supplierEmail,
+        totalAmount,
+        status,
+        orderDate,
+        expectedDelivery,
+        supplierId,
+        notes,
+        itemsCount: items ? items.length : 0,
+      });
 
       const order = await PurchaseOrderService.createOrder({
         poNumber,
@@ -66,6 +82,9 @@ export class PurchaseOrderController {
         orderDate: orderDate ? new Date(orderDate) : new Date(),
         expectedDelivery: new Date(expectedDelivery),
         userId: req.user!.id,
+        supplierId,
+        notes,
+        items,
       });
 
       res

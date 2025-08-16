@@ -10,6 +10,8 @@ import { authRoutes } from "./features/auth";
 import { inventoryRoutes } from "./features/inventory";
 import { salesOrderRoutes } from "./features/sales-orders";
 import { purchaseOrderRoutes } from "./features/purchase-orders";
+import { supplierRoutes } from "./features/suppliers";
+import { customerRoutes } from "./features/customers";
 
 // Load environment variables
 dotenv.config();
@@ -47,6 +49,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/sales-orders", salesOrderRoutes);
 app.use("/api/purchase-orders", purchaseOrderRoutes);
+app.use("/api/suppliers", supplierRoutes);
+app.use("/api/customers", customerRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {

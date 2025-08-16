@@ -40,7 +40,6 @@ async function main() {
       quantity: 100,
       unitPrice: 29.99,
       reorderLevel: 20,
-      supplier: "Supplier ABC",
       userId: user1.id,
     },
     {
@@ -50,7 +49,6 @@ async function main() {
       quantity: 50,
       unitPrice: 49.99,
       reorderLevel: 15,
-      supplier: "Supplier XYZ",
       userId: user1.id,
     },
     {
@@ -60,7 +58,6 @@ async function main() {
       quantity: 75,
       unitPrice: 19.99,
       reorderLevel: 25,
-      supplier: "Tool Supply Co",
       userId: user1.id,
     },
     {
@@ -70,7 +67,6 @@ async function main() {
       quantity: 200,
       unitPrice: 5.99,
       reorderLevel: 50,
-      supplier: "Component Corp",
       userId: user2.id,
     },
     {
@@ -80,7 +76,6 @@ async function main() {
       quantity: 300,
       unitPrice: 12.5,
       reorderLevel: 100,
-      supplier: "Material Masters",
       userId: user2.id,
     },
   ];

@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { X, Plus, Search, Trash2, Star } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import { apiClient } from "../../lib/api";
+import { apiClient, SalesOrder, SalesOrderItem } from "../../lib/api";
 
 const schema = yup.object({
   orderNumber: yup.string().required("Order number is required"),
@@ -39,7 +39,7 @@ interface EnhancedSalesOrderFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  editingOrder?: any;
+  editingOrder?: SalesOrder;
 }
 
 export function EnhancedSalesOrderForm({
@@ -79,7 +79,29 @@ export function EnhancedSalesOrderForm({
         setValue("customerName", editingOrder.customerName);
         setValue("customerEmail", editingOrder.customerEmail);
         setValue("status", editingOrder.status);
-        setValue("orderDate", editingOrder.orderDate);
+
+        // Format date for input field
+        const orderDate = new Date(editingOrder.orderDate);
+        const formattedDate = orderDate.toISOString().split("T")[0];
+        setValue("orderDate", formattedDate);
+
+        // Load existing items into cart if available
+        if (editingOrder.items && editingOrder.items.length > 0) {
+          const cartItems: CartItem[] = editingOrder.items.map(
+            (item: SalesOrderItem) => ({
+              id: item.inventory.id,
+              productName: item.inventory.productName,
+              sku: item.inventory.sku,
+              unitPrice: item.inventory.unitPrice,
+              quantity: item.inventory.quantity, // Available stock
+              cart_quantity: item.quantity, // Ordered quantity
+              sale_price: item.unitPrice, // Sale price used in order
+            })
+          );
+          setCart(cartItems);
+        } else {
+          setCart([]);
+        }
       } else {
         reset();
         setCart([]);
@@ -195,9 +217,17 @@ export function EnhancedSalesOrderForm({
     setError("");
 
     try {
+      const items = cart.map((item) => ({
+        inventoryId: item.id,
+        quantity: item.cart_quantity,
+        unitPrice: item.sale_price,
+        totalPrice: item.sale_price * item.cart_quantity,
+      }));
+
       const orderData = {
         ...data,
         totalAmount: calculateTotal(),
+        items,
       };
 
       if (editingOrder) {

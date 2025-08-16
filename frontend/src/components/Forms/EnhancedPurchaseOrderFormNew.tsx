@@ -132,7 +132,7 @@ export function EnhancedPurchaseOrderForm({
 
   const fetchProducts = async () => {
     try {
-      const response = await apiClient.getInventory();
+      const response = await apiClient.getProducts();
       if (response.success && response.data) {
         setProducts(response.data);
       }

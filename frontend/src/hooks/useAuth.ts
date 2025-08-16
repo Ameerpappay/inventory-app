@@ -31,12 +31,17 @@ export function useAuth() {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("🔐 Attempting to sign in with:", email);
       const response = await apiClient.login(email, password);
+      console.log("🔐 Login response:", response);
+
       if (response.success && response.data) {
+        console.log("✅ Login successful, setting user state");
         TokenManager.setToken(response.data.token);
         setUser(response.data.user);
         // Store user data in localStorage for persistence
         localStorage.setItem("user", JSON.stringify(response.data.user));
+        console.log("✅ User state set:", response.data.user);
         return { data: response.data, error: null };
       } else {
         return {

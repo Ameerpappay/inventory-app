@@ -29,6 +29,17 @@ export class SalesOrderController {
           .json(formatErrorResponse("Sales order not found"));
       }
 
+      console.log("Fetched sales order for edit:", {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        itemsCount: order.items?.length || 0,
+        items: order.items?.map((item: any) => ({
+          id: item.id,
+          quantity: item.quantity,
+          productName: item.inventory?.productName,
+        })),
+      });
+
       res.json(formatApiResponse(true, order));
     } catch (error) {
       console.error("Get sales order error:", error);
@@ -50,7 +61,21 @@ export class SalesOrderController {
         totalAmount,
         status = "PENDING",
         orderDate,
+        items,
+        notes,
       } = req.body;
+
+      console.log("Creating sales order with data:", {
+        orderNumber,
+        customerName,
+        customerEmail,
+        totalAmount,
+        status,
+        orderDate,
+        items: items?.length || 0,
+        notes,
+        userId: req.user!.id,
+      });
 
       const order = await SalesOrderService.createOrder({
         orderNumber,
@@ -60,6 +85,8 @@ export class SalesOrderController {
         status,
         orderDate: orderDate ? new Date(orderDate) : new Date(),
         userId: req.user!.id,
+        notes,
+        items: items || [],
       });
 
       res
@@ -87,14 +114,39 @@ export class SalesOrderController {
       }
 
       const { id } = req.params;
+      const {
+        orderNumber,
+        customerName,
+        customerEmail,
+        totalAmount,
+        status,
+        orderDate,
+        items,
+        notes,
+      } = req.body;
+
+      console.log("Updating sales order with data:", {
+        id,
+        orderNumber,
+        customerName,
+        customerEmail,
+        totalAmount,
+        status,
+        orderDate,
+        items: items?.length || 0,
+        notes,
+        userId: req.user!.id,
+      });
+
       const updateData = {
-        ...req.body,
-        totalAmount: req.body.totalAmount
-          ? parseFloat(req.body.totalAmount)
-          : undefined,
-        orderDate: req.body.orderDate
-          ? new Date(req.body.orderDate)
-          : undefined,
+        orderNumber,
+        customerName,
+        customerEmail,
+        totalAmount: totalAmount ? parseFloat(totalAmount) : undefined,
+        status,
+        orderDate: orderDate ? new Date(orderDate) : undefined,
+        notes,
+        items: items || [],
       };
 
       const updatedOrder = await SalesOrderService.updateOrder(

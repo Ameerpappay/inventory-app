@@ -54,7 +54,7 @@ export class InventoryController {
         quantity,
         unitPrice,
         reorderLevel,
-        supplier = "",
+        supplierId,
       } = req.body;
 
       const item = await InventoryService.createItem({
@@ -64,7 +64,7 @@ export class InventoryController {
         quantity: parseInt(quantity),
         unitPrice: parseFloat(unitPrice),
         reorderLevel: parseInt(reorderLevel),
-        supplier,
+        supplierId,
         userId: req.user!.id,
       });
 

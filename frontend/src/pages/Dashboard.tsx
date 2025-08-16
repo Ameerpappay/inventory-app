@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -130,16 +130,16 @@ export function Dashboard() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-4">
         <div className="animate-pulse">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-gray-200 rounded-lg h-32"></div>
+              <div key={i} className="bg-gray-200 rounded-lg h-24"></div>
             ))}
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-gray-200 rounded-lg h-80"></div>
-            <div className="bg-gray-200 rounded-lg h-80"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="bg-gray-200 rounded-lg h-64"></div>
+            <div className="bg-gray-200 rounded-lg h-64"></div>
           </div>
         </div>
       </div>
@@ -147,49 +147,49 @@ export function Dashboard() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">
+        <h1 className="text-xl font-bold text-gray-900 mb-1">Dashboard</h1>
+        <p className="text-sm text-gray-600">
           Welcome back! Here's what's happening with your business.
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card, index) => (
           <div
             key={index}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-xs font-medium text-gray-600">
                   {card.title}
                 </p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-2xl font-bold text-gray-900 mt-1">
                   {card.value}
                 </p>
-                <div className="flex items-center mt-2">
+                <div className="flex items-center mt-1">
                   {card.trendUp ? (
-                    <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
                   ) : (
-                    <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
+                    <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
                   )}
                   <span
-                    className={`text-sm font-medium ${
+                    className={`text-xs font-medium ${
                       card.trendUp ? "text-green-600" : "text-red-600"
                     }`}
                   >
                     {card.trend}
                   </span>
-                  <span className="text-sm text-gray-500 ml-1">
+                  <span className="text-xs text-gray-500 ml-1">
                     vs last month
                   </span>
                 </div>
               </div>
-              <div className={`p-3 rounded-full ${card.color}`}>
-                <card.icon className="h-6 w-6 text-white" />
+              <div className={`p-2 rounded-full ${card.color}`}>
+                <card.icon className="h-4 w-4 text-white" />
               </div>
             </div>
           </div>
@@ -197,13 +197,13 @@ export function Dashboard() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Sales & Purchases Chart */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h3 className="text-md font-semibold text-gray-900 mb-3">
             Sales vs Purchases
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={salesData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
@@ -216,17 +216,17 @@ export function Dashboard() {
         </div>
 
         {/* Order Status Chart */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h3 className="text-md font-semibold text-gray-900 mb-3">
             Order Status Distribution
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
                 data={orderStatusData}
                 cx="50%"
                 cy="50%"
-                outerRadius={100}
+                outerRadius={80}
                 dataKey="value"
                 label={({ name, percent }) =>
                   `${name} ${((percent || 0) * 100).toFixed(0)}%`
@@ -244,13 +244,13 @@ export function Dashboard() {
 
       {/* Recent Activity */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">
+        <div className="px-4 py-3 border-b border-gray-200">
+          <h3 className="text-md font-semibold text-gray-900">
             Recent Activity
           </h3>
         </div>
-        <div className="p-6">
-          <div className="space-y-4">
+        <div className="p-4">
+          <div className="space-y-3">
             {[
               {
                 action: "New sales order #SO-001 created",
@@ -273,9 +273,9 @@ export function Dashboard() {
                 type: "sale",
               },
             ].map((activity, index) => (
-              <div key={index} className="flex items-center space-x-3">
+              <div key={index} className="flex items-center space-x-2">
                 <div
-                  className={`w-2 h-2 rounded-full ${
+                  className={`w-1.5 h-1.5 rounded-full ${
                     activity.type === "sale"
                       ? "bg-blue-500"
                       : activity.type === "purchase"
@@ -284,7 +284,7 @@ export function Dashboard() {
                   }`}
                 />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900">{activity.action}</p>
+                  <p className="text-xs text-gray-900">{activity.action}</p>
                   <p className="text-xs text-gray-500">{activity.time}</p>
                 </div>
               </div>

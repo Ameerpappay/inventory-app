@@ -20,6 +20,14 @@ export class PurchaseOrderService {
   static async getOrderById(id: string, userId: string) {
     const order = await prisma.purchaseOrder.findFirst({
       where: { id, userId },
+      include: {
+        items: {
+          include: {
+            inventory: true,
+          },
+        },
+        supplier: true,
+      },
     });
 
     if (!order) return null;
@@ -28,10 +36,21 @@ export class PurchaseOrderService {
     return {
       ...order,
       totalAmount: Number(order.totalAmount),
+      items: order.items.map((item) => ({
+        ...item,
+        costPerUnit: Number(item.costPerUnit),
+        totalCost: Number(item.totalCost),
+        inventory: {
+          ...item.inventory,
+          unitPrice: Number(item.inventory.unitPrice),
+        },
+      })),
     };
   }
 
-  static async createOrder(data: Omit<PurchaseOrder, "id" | "createdAt">) {
+  static async createOrder(
+    data: Omit<PurchaseOrder, "id" | "createdAt"> & { items?: any[] }
+  ) {
     // Check if PO number already exists
     const existingPO = await prisma.purchaseOrder.findUnique({
       where: { poNumber: data.poNumber },
@@ -41,13 +60,49 @@ export class PurchaseOrderService {
       throw new Error("PO number already exists");
     }
 
-    return await prisma.purchaseOrder.create({
+    // Extract items from data
+    const { items, ...orderData } = data;
+
+    const order = await prisma.purchaseOrder.create({
       data: {
-        ...data,
-        orderDate: data.orderDate || new Date(),
-        expectedDelivery: new Date(data.expectedDelivery),
+        ...orderData,
+        orderDate: orderData.orderDate || new Date(),
+        expectedDelivery: new Date(orderData.expectedDelivery),
+        // Create items if provided
+        ...(items &&
+          items.length > 0 && {
+            items: {
+              create: items.map((item: any) => ({
+                inventoryId: item.product.id,
+                quantity: item.quantity,
+                costPerUnit: item.cost_per_unit,
+                totalCost: item.total,
+              })),
+            },
+          }),
+      },
+      include: {
+        items: {
+          include: {
+            inventory: true,
+          },
+        },
       },
     });
+
+    return {
+      ...order,
+      totalAmount: Number(order.totalAmount),
+      items: order.items.map((item: any) => ({
+        ...item,
+        costPerUnit: Number(item.costPerUnit),
+        totalCost: Number(item.totalCost),
+        inventory: {
+          ...item.inventory,
+          unitPrice: Number(item.inventory.unitPrice),
+        },
+      })),
+    };
   }
 
   static async updateOrder(

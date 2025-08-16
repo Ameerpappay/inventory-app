@@ -14,10 +14,10 @@ export interface InventoryItem {
   quantity: number;
   unitPrice: number;
   reorderLevel: number;
-  supplier: string;
   userId: string;
   createdAt: Date;
   updatedAt: Date;
+  supplierId?: string;
 }
 
 export interface SalesOrder {
@@ -30,6 +30,17 @@ export interface SalesOrder {
   orderDate: Date;
   createdAt: Date;
   userId: string;
+  notes?: string;
+}
+
+export interface SalesOrderItem {
+  id: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  createdAt: Date;
+  salesOrderId: string;
+  inventoryId: string;
 }
 
 export interface PurchaseOrder {
@@ -43,6 +54,18 @@ export interface PurchaseOrder {
   expectedDelivery: Date;
   createdAt: Date;
   userId: string;
+  supplierId?: string;
+  notes?: string;
+}
+
+export interface PurchaseOrderItem {
+  id: string;
+  quantity: number;
+  costPerUnit: number;
+  totalCost: number;
+  createdAt: Date;
+  purchaseOrderId: string;
+  inventoryId: string;
 }
 
 export interface ApiResponse<T = any> {

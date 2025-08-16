@@ -31,10 +31,11 @@ export interface InventoryItem {
   quantity: number;
   unitPrice: number;
   reorderLevel: number;
-  supplier: string;
   userId: string;
   createdAt: string;
   updatedAt: string;
+  supplierId?: string;
+  supplier?: Supplier; // Optional populated supplier data
 }
 
 export interface SalesOrder {
@@ -47,6 +48,16 @@ export interface SalesOrder {
   orderDate: string;
   createdAt: string;
   userId: string;
+  notes?: string;
+  items?: SalesOrderItem[];
+}
+
+export interface SalesOrderItem {
+  id: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  inventory: InventoryItem;
 }
 
 export interface PurchaseOrder {
@@ -59,6 +70,35 @@ export interface PurchaseOrder {
   orderDate: string;
   expectedDelivery: string;
   createdAt: string;
+  userId: string;
+  supplierId?: string;
+  notes?: string;
+  items?: PurchaseOrderItem[];
+}
+
+export interface PurchaseOrderItem {
+  id: string;
+  quantity: number;
+  costPerUnit: number;
+  totalCost: number;
+  inventory: InventoryItem;
+}
+
+export interface Supplier {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  contactPerson?: string;
+  website?: string;
+  notes?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
   userId: string;
 }
 
@@ -190,7 +230,14 @@ class ApiClient {
   }
 
   async createSalesOrder(
-    order: Omit<SalesOrder, "id" | "userId" | "createdAt">
+    order: Omit<SalesOrder, "id" | "userId" | "createdAt"> & {
+      items?: Array<{
+        inventoryId: string;
+        quantity: number;
+        unitPrice: number;
+        totalPrice: number;
+      }>;
+    }
   ): Promise<ApiResponse<SalesOrder>> {
     return this.request<SalesOrder>("/sales-orders", {
       method: "POST",
@@ -200,7 +247,14 @@ class ApiClient {
 
   async updateSalesOrder(
     id: string,
-    order: Partial<Omit<SalesOrder, "id" | "userId" | "createdAt">>
+    order: Partial<Omit<SalesOrder, "id" | "userId" | "createdAt">> & {
+      items?: Array<{
+        inventoryId: string;
+        quantity: number;
+        unitPrice: number;
+        totalPrice: number;
+      }>;
+    }
   ): Promise<ApiResponse<SalesOrder>> {
     return this.request<SalesOrder>(`/sales-orders/${id}`, {
       method: "PUT",
@@ -262,6 +316,52 @@ class ApiClient {
 
   async getOverduePurchaseOrders(): Promise<ApiResponse<PurchaseOrder[]>> {
     return this.request<PurchaseOrder[]>("/purchase-orders/alerts/overdue");
+  }
+
+  // Suppliers endpoints
+  async getSuppliers(): Promise<ApiResponse<Supplier[]>> {
+    return this.request<Supplier[]>("/suppliers");
+  }
+
+  async getActiveSuppliers(): Promise<ApiResponse<Supplier[]>> {
+    return this.request<Supplier[]>("/suppliers/active");
+  }
+
+  async getSupplier(id: string): Promise<ApiResponse<Supplier>> {
+    return this.request<Supplier>(`/suppliers/${id}`);
+  }
+
+  async createSupplier(
+    supplier: Omit<Supplier, "id" | "userId" | "createdAt" | "updatedAt">
+  ): Promise<ApiResponse<Supplier>> {
+    return this.request<Supplier>("/suppliers", {
+      method: "POST",
+      body: JSON.stringify(supplier),
+    });
+  }
+
+  async updateSupplier(
+    id: string,
+    supplier: Partial<
+      Omit<Supplier, "id" | "userId" | "createdAt" | "updatedAt">
+    >
+  ): Promise<ApiResponse<Supplier>> {
+    return this.request<Supplier>(`/suppliers/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(supplier),
+    });
+  }
+
+  async deleteSupplier(id: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/suppliers/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  async toggleSupplierStatus(id: string): Promise<ApiResponse<Supplier>> {
+    return this.request<Supplier>(`/suppliers/${id}/toggle-status`, {
+      method: "PATCH",
+    });
   }
 }
 

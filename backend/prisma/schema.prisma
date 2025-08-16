@@ -22,8 +22,65 @@ model User {
   salesOrders    SalesOrder[]
   purchaseOrders PurchaseOrder[]
   inventory      Inventory[]
+  suppliers      Supplier[]
+  customers      Customer[]
 
   @@map("users")
+}
+
+model Supplier {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?  @map("zip_code")
+  contactPerson String? @map("contact_person")
+  website     String?
+  notes       String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  userId      String   @map("user_id")
+
+  // Relations
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inventory Inventory[]
+  purchaseOrders PurchaseOrder[]
+
+  @@index([userId])
+  @@index([name])
+  @@index([isActive])
+  @@map("suppliers")
+}
+
+model Customer {
+  id            String   @id @default(cuid())
+  name          String
+  email         String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?  @map("zip_code")
+  contactPerson String?  @map("contact_person")
+  companyType   String?  @map("company_type")
+  notes         String?
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  userId        String   @map("user_id")
+
+  // Relations
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  salesOrders SalesOrder[]
+
+  @@index([userId])
+  @@index([name])
+  @@index([isActive])
+  @@map("customers")
 }
 
 model SalesOrder {
@@ -36,14 +93,37 @@ model SalesOrder {
   orderDate     DateTime         @default(now()) @map("order_date") @db.Date
   createdAt     DateTime         @default(now()) @map("created_at")
   userId        String           @map("user_id")
+  customerId    String?          @map("customer_id")
+  notes         String?
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items    SalesOrderItem[]
 
   @@index([userId])
   @@index([status])
   @@index([orderDate])
+  @@index([customerId])
   @@map("sales_orders")
+}
+
+model SalesOrderItem {
+  id           String    @id @default(cuid())
+  quantity     Int
+  unitPrice    Decimal   @map("unit_price") @db.Decimal(10, 2)
+  totalPrice   Decimal   @map("total_price") @db.Decimal(10, 2)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  salesOrderId String    @map("sales_order_id")
+  inventoryId  String    @map("inventory_id")
+
+  // Relations
+  salesOrder SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  inventory  Inventory  @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  @@index([salesOrderId])
+  @@index([inventoryId])
+  @@map("sales_order_items")
 }
 
 model PurchaseOrder {
@@ -57,14 +137,37 @@ model PurchaseOrder {
   expectedDelivery DateTime            @map("expected_delivery") @db.Date
   createdAt        DateTime            @default(now()) @map("created_at")
   userId           String              @map("user_id")
+  supplierId       String?             @map("supplier_id")
+  notes            String?
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  supplier Supplier?           @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  items    PurchaseOrderItem[]
 
   @@index([userId])
   @@index([status])
   @@index([orderDate])
+  @@index([supplierId])
   @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String        @id @default(cuid())
+  quantity        Int
+  costPerUnit     Decimal       @map("cost_per_unit") @db.Decimal(10, 2)
+  totalCost       Decimal       @map("total_cost") @db.Decimal(10, 2)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  purchaseOrderId String        @map("purchase_order_id")
+  inventoryId     String        @map("inventory_id")
+
+  // Relations
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  inventory     Inventory     @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  @@index([purchaseOrderId])
+  @@index([inventoryId])
+  @@map("purchase_order_items")
 }
 
 model Inventory {
@@ -75,17 +178,21 @@ model Inventory {
   quantity     Int      @default(0)
   unitPrice    Decimal  @default(0) @map("unit_price") @db.Decimal(10, 2)
   reorderLevel Int      @default(10) @map("reorder_level")
-  supplier     String   @default("")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   userId       String   @map("user_id")
+  supplierId   String?  @map("supplier_id")
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  supplier           Supplier?           @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  purchaseOrderItems PurchaseOrderItem[]
+  salesOrderItems    SalesOrderItem[]
 
   @@index([userId])
   @@index([category])
   @@index([sku])
+  @@index([supplierId])
   @@map("inventory")
 }
 
