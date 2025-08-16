@@ -5,14 +5,17 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only src/index.ts",
     "dev:nodemon": "nodemon --exec ts-node src/index.ts",
-    "start": "node dist/src/index.js",
+    "start": "cross-env NODE_ENV=production node dist/src/index.js",
+    "start:dev": "cross-env NODE_ENV=development node dist/src/index.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:prod": "cross-env NODE_ENV=production prisma migrate deploy",
     "db:studio": "prisma studio",
-    "db:seed": "ts-node prisma/seed.ts"
+    "db:seed": "ts-node prisma/seed.ts",
+    "db:seed:prod": "cross-env NODE_ENV=production ts-node prisma/seed.ts"
   },
   "keywords": [
     "inventory",
@@ -41,6 +44,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.14.15",
+    "cross-env": "^10.0.0",
     "nodemon": "^3.1.10",
     "prisma": "^5.19.1",
     "ts-node": "^10.9.2",

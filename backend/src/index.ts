@@ -5,6 +5,16 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 
+// Simple environment loading
+const envFile =
+  process.env.NODE_ENV === "production"
+    ? ".env.production"
+    : ".env.development";
+dotenv.config({ path: envFile });
+
+// Optional: Load local overrides
+dotenv.config({ path: ".env.local", override: true });
+
 // Import feature routes
 import { authRoutes } from "./features/auth";
 import { inventoryRoutes } from "./features/inventory";
@@ -12,9 +22,6 @@ import { salesOrderRoutes } from "./features/sales-orders";
 import { purchaseOrderRoutes } from "./features/purchase-orders";
 import { supplierRoutes } from "./features/suppliers";
 import { customerRoutes } from "./features/customers";
-
-// Load environment variables
-dotenv.config();
 
 // Initialize Prisma Client
 export const prisma = new PrismaClient();
@@ -98,4 +105,14 @@ process.on("SIGTERM", async () => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📚 Health check: http://localhost:${PORT}/health`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+  console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
+  console.log(
+    `🗄️  Database: ${
+      process.env.DATABASE_URL?.split("@")[1]?.split("/")[0] || "unknown"
+    }`
+  );
+  console.log(
+    `🔐 JWT Secret: ${process.env.JWT_SECRET ? "✅ Set" : "❌ Missing"}`
+  );
 });

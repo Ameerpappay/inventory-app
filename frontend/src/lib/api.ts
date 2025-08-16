@@ -1,6 +1,7 @@
+import { env } from "../config/env";
+
 // API configuration
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+const API_BASE_URL = env.API_URL;
 
 // Types
 export interface User {
