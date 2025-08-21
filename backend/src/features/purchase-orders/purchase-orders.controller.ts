@@ -6,6 +6,7 @@ import {
   formatErrorResponse,
 } from "../../shared/utils/helpers";
 import { AuthRequest } from "../../shared/middleware/auth";
+import { PurchaseOrderStatus } from "./purchase-order-status";
 
 export class PurchaseOrderController {
   static async getAllOrders(req: AuthRequest, res: Response) {
@@ -52,7 +53,6 @@ export class PurchaseOrderController {
         supplierName,
         supplierEmail,
         totalAmount,
-        status = "PENDING",
         orderDate,
         expectedDelivery,
         supplierId,
@@ -65,7 +65,6 @@ export class PurchaseOrderController {
         supplierName,
         supplierEmail,
         totalAmount,
-        status,
         orderDate,
         expectedDelivery,
         supplierId,
@@ -78,7 +77,7 @@ export class PurchaseOrderController {
         supplierName,
         supplierEmail,
         totalAmount: parseFloat(totalAmount),
-        status,
+        status: PurchaseOrderStatus.PENDING,
         orderDate: orderDate ? new Date(orderDate) : new Date(),
         expectedDelivery: new Date(expectedDelivery),
         userId: req.user!.id,

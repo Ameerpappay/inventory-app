@@ -1,12 +1,6 @@
 import { prisma } from "../../index";
 import { PurchaseOrder } from "../../shared/types";
-
-enum PurchaseOrderStatus {
-  PENDING = 0,
-  APPROVED = 1,
-  RECEIVED = 2,
-  CANCELLED = 3,
-}
+import { PurchaseOrderStatus } from "./purchase-order-status";
 
 export class PurchaseOrderService {
   static async getAllOrders(userId: string) {

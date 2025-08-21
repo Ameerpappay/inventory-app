@@ -6,6 +6,7 @@ import {
   formatErrorResponse,
 } from "../../shared/utils/helpers";
 import { AuthRequest } from "../../shared/middleware/auth";
+import { SalesOrderStatus } from "./SalesOrderStatus";
 
 export class SalesOrderController {
   static async getAllOrders(req: AuthRequest, res: Response) {
@@ -59,7 +60,6 @@ export class SalesOrderController {
         customerName,
         customerEmail,
         totalAmount,
-        status = "PENDING",
         orderDate,
         items,
         notes,
@@ -70,7 +70,6 @@ export class SalesOrderController {
         customerName,
         customerEmail,
         totalAmount,
-        status,
         orderDate,
         items: items?.length || 0,
         notes,
@@ -82,7 +81,7 @@ export class SalesOrderController {
         customerName,
         customerEmail,
         totalAmount: parseFloat(totalAmount),
-        status,
+        status: SalesOrderStatus.PENDING,
         orderDate: orderDate ? new Date(orderDate) : new Date(),
         userId: req.user!.id,
         notes,
