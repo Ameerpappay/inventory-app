@@ -1,12 +1,13 @@
 import { prisma } from "../../index";
 import { SalesOrder, SalesOrderItem } from "../../shared/types";
 
-type SalesOrderStatus =
-  | "PENDING"
-  | "PROCESSING"
-  | "SHIPPED"
-  | "DELIVERED"
-  | "CANCELLED";
+enum SalesOrderStatus {
+  PENDING = 0,
+  PROCESSING = 1,
+  SHIPPED = 2,
+  DELIVERED = 3,
+  CANCELLED = 4,
+}
 
 interface CreateSalesOrderData extends Omit<SalesOrder, "id" | "createdAt"> {
   items?: Array<{
@@ -35,6 +36,7 @@ export class SalesOrderService {
     // Convert Decimal values to numbers
     return orders.map((order: any) => ({
       ...order,
+      status: SalesOrderStatus[order.status as number],
       totalAmount: Number(order.totalAmount),
       items:
         order.items?.map((item: any) => ({
@@ -63,6 +65,7 @@ export class SalesOrderService {
     // Convert Decimal values to numbers
     return {
       ...order,
+      status: SalesOrderStatus[order.status as number],
       totalAmount: Number(order.totalAmount),
       // @ts-ignore - Temporary ignore until Prisma client is properly regenerated
       items:
@@ -195,6 +198,7 @@ export class SalesOrderService {
     // Convert Decimal values to numbers
     return orders.map((order: any) => ({
       ...order,
+      status: SalesOrderStatus[order.status as number],
       totalAmount: Number(order.totalAmount),
     }));
   }
@@ -218,6 +222,7 @@ export class SalesOrderService {
     // Convert Decimal values to numbers
     return orders.map((order: any) => ({
       ...order,
+      status: SalesOrderStatus[order.status as number],
       totalAmount: Number(order.totalAmount),
     }));
   }

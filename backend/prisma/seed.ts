@@ -97,7 +97,7 @@ async function main() {
       customerName: "John Doe",
       customerEmail: "john@example.com",
       totalAmount: 159.97,
-      status: "PENDING" as const,
+      status: 0, // PENDING
       userId: user1.id,
     },
     {
@@ -105,7 +105,7 @@ async function main() {
       customerName: "Jane Smith",
       customerEmail: "jane@example.com",
       totalAmount: 89.98,
-      status: "PROCESSING" as const,
+      status: 1, // PROCESSING
       userId: user1.id,
     },
     {
@@ -113,7 +113,7 @@ async function main() {
       customerName: "Bob Johnson",
       customerEmail: "bob@example.com",
       totalAmount: 299.99,
-      status: "SHIPPED" as const,
+      status: 2, // SHIPPED
       userId: user2.id,
     },
   ];
@@ -135,7 +135,7 @@ async function main() {
       supplierName: "Supplier ABC",
       supplierEmail: "orders@supplierabc.com",
       totalAmount: 2999.5,
-      status: "PENDING" as const,
+      status: 0, // PENDING
       expectedDelivery: new Date("2025-08-25"),
       userId: user1.id,
     },
@@ -144,18 +144,18 @@ async function main() {
       supplierName: "Supplier XYZ",
       supplierEmail: "orders@supplierxyz.com",
       totalAmount: 1499.75,
-      status: "APPROVED" as const,
-      expectedDelivery: new Date("2025-08-20"),
+      status: 1, // APPROVED
       userId: user1.id,
+      expectedDelivery: new Date("2025-08-20"),
     },
     {
       poNumber: "PO-2025-003",
       supplierName: "Component Corp",
       supplierEmail: "sales@componentcorp.com",
       totalAmount: 899.25,
-      status: "RECEIVED" as const,
-      expectedDelivery: new Date("2025-08-15"),
+      status: 2, // RECEIVED
       userId: user2.id,
+      expectedDelivery: new Date("2025-08-15"),
     },
   ];
 

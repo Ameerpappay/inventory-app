@@ -1,7 +1,12 @@
 import { prisma } from "../../index";
 import { PurchaseOrder } from "../../shared/types";
 
-type PurchaseOrderStatus = "PENDING" | "APPROVED" | "RECEIVED" | "CANCELLED";
+enum PurchaseOrderStatus {
+  PENDING = 0,
+  APPROVED = 1,
+  RECEIVED = 2,
+  CANCELLED = 3,
+}
 
 export class PurchaseOrderService {
   static async getAllOrders(userId: string) {
@@ -13,6 +18,7 @@ export class PurchaseOrderService {
     // Convert Decimal values to numbers
     return orders.map((order: any) => ({
       ...order,
+      status: PurchaseOrderStatus[order.status as number],
       totalAmount: Number(order.totalAmount),
     }));
   }
@@ -36,6 +42,7 @@ export class PurchaseOrderService {
     return {
       ...order,
       totalAmount: Number(order.totalAmount),
+      status: PurchaseOrderStatus[order.status as number],
       items: order.items.map((item) => ({
         ...item,
         costPerUnit: Number(item.costPerUnit),
@@ -166,6 +173,7 @@ export class PurchaseOrderService {
     // Convert Decimal values to numbers
     return orders.map((order: any) => ({
       ...order,
+      status: PurchaseOrderStatus[order.status as number],
       totalAmount: Number(order.totalAmount),
     }));
   }
@@ -189,6 +197,7 @@ export class PurchaseOrderService {
     // Convert Decimal values to numbers
     return orders.map((order: any) => ({
       ...order,
+      status: PurchaseOrderStatus[order.status as number],
       totalAmount: Number(order.totalAmount),
     }));
   }
@@ -197,7 +206,7 @@ export class PurchaseOrderService {
     const orders = await prisma.purchaseOrder.findMany({
       where: {
         userId,
-        status: { not: "RECEIVED" },
+        status: { not: PurchaseOrderStatus.RECEIVED },
         expectedDelivery: {
           lt: new Date(),
         },
@@ -208,6 +217,7 @@ export class PurchaseOrderService {
     // Convert Decimal values to numbers
     return orders.map((order: any) => ({
       ...order,
+      status: PurchaseOrderStatus[order.status as number],
       totalAmount: Number(order.totalAmount),
     }));
   }

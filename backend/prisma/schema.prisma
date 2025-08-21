@@ -1,17 +1,14 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String?
@@ -29,24 +26,24 @@ model User {
 }
 
 model Supplier {
-  id          String   @id @default(cuid())
-  name        String
-  email       String?
-  phone       String?
-  address     String?
-  city        String?
-  state       String?
-  zipCode     String?  @map("zip_code")
-  contactPerson String? @map("contact_person")
-  website     String?
-  notes       String?
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  userId      String   @map("user_id")
+  id            String   @id @default(uuid())
+  name          String
+  email         String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?  @map("zip_code")
+  contactPerson String?  @map("contact_person")
+  website       String?
+  notes         String?
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  userId        String   @map("user_id")
 
   // Relations
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   inventory Inventory[]
   purchaseOrders PurchaseOrder[]
 
@@ -57,7 +54,7 @@ model Supplier {
 }
 
 model Customer {
-  id            String   @id @default(cuid())
+  id            String   @id @default(uuid())
   name          String
   email         String?
   phone         String?
@@ -74,7 +71,7 @@ model Customer {
   userId        String   @map("user_id")
 
   // Relations
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   salesOrders SalesOrder[]
 
   @@index([userId])
@@ -84,21 +81,22 @@ model Customer {
 }
 
 model SalesOrder {
-  id            String           @id @default(cuid())
-  orderNumber   String           @unique @map("order_number")
-  customerName  String           @map("customer_name")
-  customerEmail String           @map("customer_email")
-  totalAmount   Decimal          @default(0) @map("total_amount") @db.Decimal(10, 2)
-  status        SalesOrderStatus @default(PENDING)
-  orderDate     DateTime         @default(now()) @map("order_date") @db.Date
-  createdAt     DateTime         @default(now()) @map("created_at")
-  userId        String           @map("user_id")
-  customerId    String?          @map("customer_id")
+  id            String   @id @default(uuid())
+  orderNumber   String   @unique @map("order_number")
+  customerName  String   @map("customer_name")
+  customerEmail String   @map("customer_email")
+  totalAmount   Float    @default(0.0) @map("total_amount")
+  // Status as Int: 0 = PENDING, 1 = PROCESSING, 2 = SHIPPED, 3 = DELIVERED, 4 = CANCELLED
+  status        Int      @default(0) @map("status")
+  orderDate     DateTime @default(now()) @map("order_date") @db.Date
+  createdAt     DateTime @default(now()) @map("created_at")
+  userId        String   @map("user_id")
+  customerId    String?  @map("customer_id")
   notes         String?
 
   // Relations
-  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  customer Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  customer Customer?         @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   items    SalesOrderItem[]
 
   @@index([userId])
@@ -109,17 +107,17 @@ model SalesOrder {
 }
 
 model SalesOrderItem {
-  id           String    @id @default(cuid())
+  id           String   @id @default(uuid())
   quantity     Int
-  unitPrice    Decimal   @map("unit_price") @db.Decimal(10, 2)
-  totalPrice   Decimal   @map("total_price") @db.Decimal(10, 2)
-  createdAt    DateTime  @default(now()) @map("created_at")
-  salesOrderId String    @map("sales_order_id")
-  inventoryId  String    @map("inventory_id")
+  unitPrice    Float    @map("unit_price")
+  totalPrice   Float    @map("total_price")
+  createdAt    DateTime @default(now()) @map("created_at")
+  salesOrderId String   @map("sales_order_id")
+  inventoryId  String   @map("inventory_id")
 
   // Relations
-  salesOrder SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
-  inventory  Inventory  @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  salesOrder SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  inventory  Inventory  @relation(fields: [inventoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([salesOrderId])
   @@index([inventoryId])
@@ -127,22 +125,23 @@ model SalesOrderItem {
 }
 
 model PurchaseOrder {
-  id               String              @id @default(cuid())
-  poNumber         String              @unique @map("po_number")
-  supplierName     String              @map("supplier_name")
-  supplierEmail    String              @map("supplier_email")
-  totalAmount      Decimal             @default(0) @map("total_amount") @db.Decimal(10, 2)
-  status           PurchaseOrderStatus @default(PENDING)
-  orderDate        DateTime            @default(now()) @map("order_date") @db.Date
-  expectedDelivery DateTime            @map("expected_delivery") @db.Date
-  createdAt        DateTime            @default(now()) @map("created_at")
-  userId           String              @map("user_id")
-  supplierId       String?             @map("supplier_id")
+  id               String   @id @default(uuid())
+  poNumber         String   @unique @map("po_number")
+  supplierName     String   @map("supplier_name")
+  supplierEmail    String   @map("supplier_email")
+  totalAmount      Float    @default(0.0) @map("total_amount")
+  // Status as Int: 0 = PENDING, 1 = APPROVED, 2 = RECEIVED, 3 = CANCELLED
+  status           Int      @default(0) @map("status")
+  orderDate        DateTime @default(now()) @map("order_date") @db.Date
+  expectedDelivery DateTime @map("expected_delivery") @db.Date
+  createdAt        DateTime @default(now()) @map("created_at")
+  userId           String   @map("user_id")
+  supplierId       String?  @map("supplier_id")
   notes            String?
 
   // Relations
-  user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  supplier Supplier?           @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  user     User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  supplier Supplier?           @relation(fields: [supplierId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   items    PurchaseOrderItem[]
 
   @@index([userId])
@@ -153,17 +152,17 @@ model PurchaseOrder {
 }
 
 model PurchaseOrderItem {
-  id              String        @id @default(cuid())
+  id              String   @id @default(uuid())
   quantity        Int
-  costPerUnit     Decimal       @map("cost_per_unit") @db.Decimal(10, 2)
-  totalCost       Decimal       @map("total_cost") @db.Decimal(10, 2)
-  createdAt       DateTime      @default(now()) @map("created_at")
-  purchaseOrderId String        @map("purchase_order_id")
-  inventoryId     String        @map("inventory_id")
+  costPerUnit     Float    @map("cost_per_unit")
+  totalCost       Float    @map("total_cost")
+  createdAt       DateTime @default(now()) @map("created_at")
+  purchaseOrderId String   @map("purchase_order_id")
+  inventoryId     String   @map("inventory_id")
 
   // Relations
-  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
-  inventory     Inventory     @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  inventory     Inventory     @relation(fields: [inventoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([purchaseOrderId])
   @@index([inventoryId])
@@ -171,12 +170,12 @@ model PurchaseOrderItem {
 }
 
 model Inventory {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   productName  String   @map("product_name")
   sku          String   @unique
   category     String   @default("Other")
   quantity     Int      @default(0)
-  unitPrice    Decimal  @default(0) @map("unit_price") @db.Decimal(10, 2)
+  unitPrice    Float    @default(0.0) @map("unit_price")
   reorderLevel Int      @default(10) @map("reorder_level")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
@@ -184,8 +183,8 @@ model Inventory {
   supplierId   String?  @map("supplier_id")
 
   // Relations
-  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  supplier           Supplier?           @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  supplier           Supplier?           @relation(fields: [supplierId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   purchaseOrderItems PurchaseOrderItem[]
   salesOrderItems    SalesOrderItem[]
 
@@ -194,23 +193,4 @@ model Inventory {
   @@index([sku])
   @@index([supplierId])
   @@map("inventory")
-}
-
-enum SalesOrderStatus {
-  PENDING
-  PROCESSING
-  SHIPPED
-  DELIVERED
-  CANCELLED
-
-  @@map("sales_order_status")
-}
-
-enum PurchaseOrderStatus {
-  PENDING
-  APPROVED
-  RECEIVED
-  CANCELLED
-
-  @@map("purchase_order_status")
 }

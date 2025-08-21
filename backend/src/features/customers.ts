@@ -126,9 +126,9 @@ router.get(
           AND: [
             {
               OR: [
-                { name: { contains: term, mode: "insensitive" } },
-                { email: { contains: term, mode: "insensitive" } },
-                { contactPerson: { contains: term, mode: "insensitive" } },
+                { name: { contains: term } },
+                { email: { contains: term } },
+                { contactPerson: { contains: term } },
                 { phone: { contains: term } },
               ],
             },

@@ -42,6 +42,7 @@ export function useAuth() {
         // Store user data in localStorage for persistence
         localStorage.setItem("user", JSON.stringify(response.data.user));
         console.log("✅ User state set:", response.data.user);
+        window.location.href = "/dashboard"; // full reload
         return { data: response.data, error: null };
       } else {
         return {
@@ -89,6 +90,7 @@ export function useAuth() {
     TokenManager.removeToken();
     localStorage.removeItem("user");
     setUser(null);
+    window.location.href = "/"; // full reload
     return { error: null };
   };
 

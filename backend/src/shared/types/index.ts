@@ -26,7 +26,7 @@ export interface SalesOrder {
   customerName: string;
   customerEmail: string;
   totalAmount: number;
-  status: "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+  status: number;
   orderDate: Date;
   createdAt: Date;
   userId: string;
@@ -49,7 +49,7 @@ export interface PurchaseOrder {
   supplierName: string;
   supplierEmail: string;
   totalAmount: number;
-  status: "PENDING" | "APPROVED" | "RECEIVED" | "CANCELLED";
+  status: number;
   orderDate: Date;
   expectedDelivery: Date;
   createdAt: Date;
