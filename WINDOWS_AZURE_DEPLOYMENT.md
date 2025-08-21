@@ -17,6 +17,7 @@ Use Remote Desktop Connection to connect to your Windows Azure VM.
 ### Step 2: Install Prerequisites
 
 #### Install Node.js
+
 1. Download Node.js LTS from https://nodejs.org/
 2. Run the installer and follow the wizard
 3. Verify installation:
@@ -26,11 +27,13 @@ Use Remote Desktop Connection to connect to your Windows Azure VM.
    ```
 
 #### Install PostgreSQL
+
 1. Download PostgreSQL from https://www.postgresql.org/download/windows/
 2. Run installer and remember the password you set
 3. Add PostgreSQL to system PATH
 
 #### Install Git
+
 1. Download Git from https://git-scm.com/download/win
 2. Install with default settings
 
@@ -66,6 +69,7 @@ New-Item -Path ".env.production" -ItemType File
 ```
 
 **.env.production content:**
+
 ```env
 NODE_ENV=production
 PORT=3001
@@ -106,6 +110,7 @@ New-Item -Path ".env.production" -ItemType File
 ```
 
 **.env.production content:**
+
 ```env
 VITE_API_URL=http://your-vm-public-ip:3001/api
 VITE_NODE_ENV=production
@@ -121,11 +126,13 @@ npm run build
 ### Step 6: Setup IIS (Alternative to Nginx)
 
 1. **Enable IIS**:
+
    - Open "Turn Windows features on or off"
    - Enable "Internet Information Services"
    - Enable "IIS Management Console"
 
 2. **Configure IIS**:
+
    - Open IIS Manager
    - Create new site pointing to `frontend/dist` folder
    - Set port to 80

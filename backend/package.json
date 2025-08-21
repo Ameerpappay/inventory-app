@@ -10,7 +10,7 @@
     "start": "cross-env NODE_ENV=production node dist/src/index.js",
     "start:dev": "cross-env NODE_ENV=development node dist/src/index.js",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push",
+    "db:push": "cross-env ENV_FILE=.env.development prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:migrate:prod": "cross-env NODE_ENV=production prisma migrate deploy",
     "db:studio": "prisma studio",

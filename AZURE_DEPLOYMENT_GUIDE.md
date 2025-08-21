@@ -3,6 +3,7 @@
 ## Prerequisites on Azure VM
 
 ### 1. Connect to Your Azure VM
+
 ```bash
 # SSH into your Azure VM (replace with your VM's public IP)
 ssh azureuser@<your-vm-public-ip>
@@ -11,6 +12,7 @@ ssh azureuser@<your-vm-public-ip>
 ### 2. Install Required Software
 
 #### Install Node.js and npm
+
 ```bash
 # Update package manager
 sudo apt update
@@ -25,6 +27,7 @@ npm --version
 ```
 
 #### Install PostgreSQL
+
 ```bash
 # Install PostgreSQL
 sudo apt install postgresql postgresql-contrib
@@ -38,6 +41,7 @@ sudo -u postgres psql
 ```
 
 In PostgreSQL shell:
+
 ```sql
 CREATE DATABASE inventory_app_prod;
 CREATE USER inventory_user WITH PASSWORD 'your_secure_password_here';
@@ -46,16 +50,19 @@ GRANT ALL PRIVILEGES ON DATABASE inventory_app_prod TO inventory_user;
 ```
 
 #### Install PM2 (Process Manager)
+
 ```bash
 sudo npm install -g pm2
 ```
 
 #### Install Nginx (Web Server)
+
 ```bash
 sudo apt install nginx
 ```
 
 ### 3. Configure Firewall
+
 ```bash
 # Allow HTTP, HTTPS, and SSH
 sudo ufw allow 22/tcp
@@ -69,6 +76,7 @@ sudo ufw enable
 ### Step 1: Upload Your Code
 
 #### Option A: Using Git (Recommended)
+
 ```bash
 # On your Azure VM
 git clone https://github.com/Ameerpappay/inventory-app.git
@@ -76,6 +84,7 @@ cd inventory-app
 ```
 
 #### Option B: Using SCP
+
 ```bash
 # From your local machine
 scp -r d:\InventoryApp azureuser@<vm-ip>:~/inventory-app
@@ -94,6 +103,7 @@ nano .env.production
 ```
 
 Add to `.env.production`:
+
 ```env
 NODE_ENV=production
 PORT=3001
@@ -133,6 +143,7 @@ nano .env.production
 ```
 
 Add to `.env.production`:
+
 ```env
 VITE_API_URL=http://<your-vm-public-ip>:3001/api
 VITE_NODE_ENV=production
@@ -152,6 +163,7 @@ sudo nano /etc/nginx/sites-available/inventory-app
 ```
 
 Add this configuration:
+
 ```nginx
 server {
     listen 80;
@@ -209,6 +221,7 @@ sudo crontab -e
 ## Monitoring and Maintenance
 
 ### PM2 Commands
+
 ```bash
 pm2 status                 # Check status
 pm2 logs inventory-backend # View logs
@@ -217,12 +230,14 @@ pm2 stop inventory-backend    # Stop app
 ```
 
 ### Database Backup
+
 ```bash
 # Create backup script
 nano ~/backup-db.sh
 ```
 
 Add to backup script:
+
 ```bash
 #!/bin/bash
 DATE=$(date +%Y%m%d_%H%M%S)
@@ -244,11 +259,13 @@ crontab -e
 ## Security Considerations
 
 ### 1. Environment Variables
+
 - Never commit `.env.production` to git
 - Use strong, unique passwords
 - Generate a secure JWT secret (64+ characters)
 
 ### 2. Database Security
+
 ```bash
 # Edit PostgreSQL config
 sudo nano /etc/postgresql/*/main/postgresql.conf
@@ -259,6 +276,7 @@ sudo nano /etc/postgresql/*/main/pg_hba.conf
 ```
 
 ### 3. Regular Updates
+
 ```bash
 # Update system packages
 sudo apt update && sudo apt upgrade
@@ -270,6 +288,7 @@ npm audit fix
 ## Troubleshooting
 
 ### Check Services Status
+
 ```bash
 sudo systemctl status nginx
 sudo systemctl status postgresql
@@ -277,6 +296,7 @@ pm2 status
 ```
 
 ### View Logs
+
 ```bash
 pm2 logs inventory-backend
 sudo tail -f /var/log/nginx/error.log
@@ -284,6 +304,7 @@ sudo tail -f /var/log/nginx/access.log
 ```
 
 ### Common Issues
+
 1. **Port 3001 blocked**: Check firewall rules
 2. **Database connection fails**: Verify PostgreSQL is running and credentials are correct
 3. **Frontend not loading**: Check nginx configuration and file permissions
@@ -292,10 +313,12 @@ sudo tail -f /var/log/nginx/access.log
 ## Access Your Application
 
 Once deployed, access your app at:
+
 - **Frontend**: `http://<your-vm-public-ip>`
 - **Backend API**: `http://<your-vm-public-ip>/api`
 - **Health Check**: `http://<your-vm-public-ip>/api/health`
 
 For HTTPS (if SSL configured):
+
 - **Frontend**: `https://yourdomain.com`
 - **Backend API**: `https://yourdomain.com/api`
